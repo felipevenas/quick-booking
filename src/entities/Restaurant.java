@@ -6,12 +6,14 @@ public class Restaurant {
 	
 	private String name;
 	private Integer id;
+	private String category;
 	
 	public Restaurant() {}
 
-	public Restaurant(String name, int id) {
+	public Restaurant(String name, int id, String category) {
 		this.name = name;
 		this.id = id;
+		this.category = category;
 	}
 
 	public String getName() {
@@ -28,6 +30,14 @@ public class Restaurant {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
 	@Override

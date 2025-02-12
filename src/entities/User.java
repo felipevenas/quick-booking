@@ -1,17 +1,22 @@
 package entities;
 
+import java.util.Date;
 import java.util.Objects;
 
 public class User {
 	
 	private String name;
 	private String email;
+	private Date booking;
+	private Integer id;
 	
 	public User() {}
 	
-	public User(String name, String email) {
+	public User(String name, String email, Date booking, int id) {
 		this.name = name;
 		this.email = email;
+		this.booking = booking;
+		this.id = id;
 	}
 
 	public String getName() {
@@ -28,6 +33,22 @@ public class User {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public Date getBooking() {
+		return booking;
+	}
+
+	public void setBooking(Date booking) {
+		this.booking = booking;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	@Override
