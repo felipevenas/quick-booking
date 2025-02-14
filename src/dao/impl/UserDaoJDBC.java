@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 import dao.UserDao;
@@ -16,7 +17,9 @@ public class UserDaoJDBC implements UserDao {
 
 	private Connection conn;
 	
-	public UserDaoJDBC(Connection conn) {}
+	public UserDaoJDBC(Connection conn) {
+		this.conn = conn;
+	}
 
 	@Override
 	public void insert(User obj) {
@@ -28,7 +31,7 @@ public class UserDaoJDBC implements UserDao {
 			
 			ps = conn.prepareStatement(
 					"INSERT INTO tbl_user "
-					+ "(id_user, name_user, email_user, date_booking) "
+					+ "(id_user, nome_user, email_user, date_booking) "
 					+ "VALUES "
 					+ "(?, ?, ?, ?)",
 					Statement.RETURN_GENERATED_KEYS);
@@ -68,7 +71,7 @@ public class UserDaoJDBC implements UserDao {
 			
 			ps = conn.prepareStatement(
 					"UPDATE tbl_user "
-					+ "SET name_user = ?, email_user = ?, date_booking = ? "
+					+ "SET nome_user = ?, email_user = ?, date_booking = ? "
 					+ "WHERE id_user = ?");
 			
 			ps.setString(1, obj.getName());
@@ -76,7 +79,6 @@ public class UserDaoJDBC implements UserDao {
 			ps.setDate(3, new java.sql.Date(obj.getBooking().getTime()));
 			ps.setInt(4, obj.getId());
 
-			
 			ps.executeUpdate();
 			
 		}
@@ -93,12 +95,11 @@ public class UserDaoJDBC implements UserDao {
 	public void deleteById(Integer id) {
 		
 		PreparedStatement ps = null;
-		ResultSet rs = null;
 		
 		try {
 			
 			ps = conn.prepareStatement(
-					"DELE FROM tbl_user "
+					"DELETE FROM tbl_user "
 					+ "WHERE id_user = ?");
 			
 			ps.setInt(1, id);
@@ -109,17 +110,82 @@ public class UserDaoJDBC implements UserDao {
 		catch (SQLException e) {
 			throw new DbException(e.getMessage());
 		}
+		finally {
+			DB.closeStatement(ps);
+		}
 	}
 
 	@Override
 	public User findById(Integer id) {
-		return null;
+
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		
+		try {
+			
+			ps = conn.prepareStatement(
+					"SELECT tbl_user.* "
+					+ "FROM tbl_user "
+					+ "WHERE id_user = ?");
+			
+			ps.setInt(1, id);
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				User obj = instanciateUser(rs);
+				return obj;
+			}
+			return null;
+		}
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(ps);
+			DB.closeResultSet(rs);
+		}
+		
 	}
 
 	@Override
-	public List<User> findall() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<User> findAll() {
+		
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		
+		try {
+			
+			ps = conn.prepareStatement(
+					"SELECT tbl_user.* "
+					+ "FROM tbl_user "
+					+ "ORDER BY id_user");
+			
+			rs = ps.executeQuery();
+			
+			List<User> list = new ArrayList<User>();
+			
+			while(rs.next()) {
+				
+				User obj = instanciateUser(rs);
+				list.add(obj);
+				
+			}
+			
+			return list;
+			
+		}
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+	}
+	
+	private User instanciateUser(ResultSet rs) throws SQLException {
+		User obj = new User();
+		obj.setId(rs.getInt("id_user"));
+		obj.setName(rs.getString("nome_user"));
+		obj.setEmail(rs.getString("email_user"));
+		obj.setId(rs.getInt("id_user"));
+		obj.setBooking(rs.getDate("date_booking"));
+		return obj;
 	}
 
 }
